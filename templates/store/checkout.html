@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block page_content %}
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+          <h1>
+            Cashier Dashboard
+            <small>/ Process Sale</small>
+          </h1>
+          <ol class="breadcrumb">
+            <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Cashier</li>
+          </ol>
+        </section>
+
+        <!-- Main content -->
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <!-- left column -->
+            <div class="col-md-6">
+              <!-- general form elements -->
+              <div class="box box-primary">
+                <div class="box-header">
+                  <h3 class="box-title">Payment details</h3>
+                </div><!-- /.box-header -->
+                <!-- form start -->
+                <div class="box-body">
+                  <form action="/checkout/" method="post" role="form" class="row g-3">
+                    {% csrf_token %}
+                    <div class="form-group col-lg-6 mb-3">
+                      <label for="exampleInputEmail1">Customer First Name</label>
+                      <input type="text" class="form-control" name="first_name" placeholder="Enter firstname">
+                    </div>
+                    <div class="form-group col-lg-6 mb-3">
+                      <label for="exampleInputEmail1">Customer Last Name</label>
+                      <input type="text" class="form-control" name="last_name" placeholder="Enter lastname">
+                    </div>
+
+                    <div class="form-group col-lg-6 mb-3">
+                      <label for="exampleInputPassword1">Customer Phone</label>
+                      <input type="tel" class="form-control" name="phone" placeholder="Enter phone number, eg 07...">
+                    </div>
+                    <div class="form-group col-lg-6 mb-3">
+                      <label for="exampleInputPassword1">Customer Email</label>
+                      <input type="email" class="form-control" name="email" placeholder="Enter email">
+                    </div>
+                    <div class="form-group col-lg-4 mb-3">
+                      <label>Payment method</label>
+                      <select name="payment_method" class="form-control">
+                        <option value="cash">Cash</option>
+                        <option value="mpesa">Mpesa</option>
+                        <option value="credit">Credit</option>
+                      </select>
+                    </div>
+                    <div class="form-group col-lg-4 mb-3">
+                      <label for="exampleInputPassword1">Amount Paid</label>
+                      <input type="number" class="form-control" name="amount_paid" placeholder="Amount in KES">
+                    </div>
+                    <div class="form-group col-lg-4 mb-3">
+                      <label for="exampleInputPassword1">Invoice No.</label>
+                      <input type="text" class="form-control" name="invoice_no" placeholder="Enter invoice no.">
+                    </div>
+                    <div class="form-group col-lg-4 mb-3">                      
+                      <input type="submit" class="btn btn-primary" value="Submit">
+                    </div>
+                  </form>
+                </div><!-- /.box-body -->
+
+              </div><!-- /.box -->
+
+            </div><!--/.col (left) -->
+            <!-- right column -->
+            <div class="col-md-6">
+              <!-- general form elements disabled -->
+              <div class="box box-warning">
+                <div class="box-header">
+                  <h3 class="box-title">Sale details</h3>
+                  <a href="/invoice/{{active_bill.id}}/"><button class="form-group pull-right">Generate Invoice</button></a>
+                </div><!-- /.box-header -->
+                <div class="box-body">
+                  <table class="table mt-3">
+                    <thead>
+                      <th>#</th>
+                      <th>Item</th>
+                      <th>Quantity</th>
+                      <th>Price for Each in KES</th>
+                      <th>Amount in KES</th>
+                    </thead>
+                    <tbody>
+                      {% if active_bill %}
+                      {% for item in active_bill.bill_items.all %}
+                      <tr>
+                        <td>{{item.id}}</td>
+                        <td>{{item.product.name}}</td>
+                        <td>{{item.quantity}}</td>
+                        <td>{{item.product.price | floatformat:2 | intcomma}}</td>
+                        <td>{{item.sum_total | floatformat:2 | intcomma}}</td>
+                      </tr>
+                      {% endfor %}
+                      {% endif %}
+                    </tbody>
+                    <tfoot>
+                      {% if active_bill %}
+                      <th colspan="4">Total Billed in KES</th>
+                      <th>{{active_bill.get_bill_total | floatformat:2 | intcomma}}</th>
+                      {% endif %}
+                    </tfoot>
+                  </table>
+                </div><!-- /.box-body -->
+              </div><!-- /.box -->
+            </div><!--/.col (right) -->
+          </div>   <!-- /.row -->
+        </section><!-- /.content -->
+      </div><!-- /.content-wrapper -->
+{% endblock page_content %}
