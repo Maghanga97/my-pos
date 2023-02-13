@@ -4,6 +4,7 @@ from .forms import *
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.db.models import Sum, Max
+import datetime
 
 # Create your views here.
 
@@ -59,8 +60,8 @@ def billing(request, product_id=None):
 		product_quantity = request.POST.get("quantity-bought")
 		product_price = request.POST.get("product-price")
 		bill_product, created = Inventory.objects.get_or_create(name=product_name, price=product_price)
-		new_bill_total = bill_product.price*int(product_quantity)
-		if active_bill:
+		new_bill_total = float(bill_product.price)*int(product_quantity)
+		if active_bill is not None:
 			if active_bill.bill_items.all().filter(product=bill_product).exists():
 				get_bill_item = BillItem.objects.get(product=bill_product, bill=active_bill)
 				get_bill_item.quantity += int(product_quantity)
@@ -84,6 +85,7 @@ def billing(request, product_id=None):
 	context_data["active_bill"] = active_bill
 
 	return render(request, "store/create-sale.html", context_data)
+
 
 def checkout(request, bill_id=None):
 	context_data = {}
@@ -111,8 +113,13 @@ def checkout(request, bill_id=None):
 		active_bill.payment_method = new_payment_method
 		active_bill.customer = bill_customer
 		active_bill.save()
-		if int(get_amount_paid) > 0:
-			new_transaction = BillTransaction.objects.create(bill=active_bill, amount_paid=get_amount_paid)
+
+		try:
+			if int(get_amount_paid) > 0:
+				new_transaction = BillTransaction.objects.create(bill=active_bill, amount_paid=get_amount_paid)
+		except:
+			pass
+			
 		return redirect("/checkout/")
 	return render(request, "store/checkout.html", context_data)
 
@@ -126,4 +133,6 @@ def sales_invoice(request, bill_id):
 	active_bill.processed = True
 	active_bill.save()
 	context_data["active_bill"] = active_bill
+	context_data["date_now"] = datetime.datetime.now()
+	context_data["amount_due"] = active_bill.get_bill_total - active_bill.get_total_amount_paid
 	return render(request, "store/invoice.html", context_data)

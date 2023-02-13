@@ -30,7 +30,7 @@
             <div class="col-xs-12">
               <h2 class="page-header">
                 <i class="fa fa-globe"></i> Shop-name, Inc.
-                <small class="pull-right">Date: 2/10/2014</small>
+                <small class="pull-right">Date: {{date_now}}</small>
               </h2>
             </div><!-- /.col -->
           </div>
@@ -55,7 +55,7 @@
             </div><!-- /.col -->
             <div class="col-sm-4 invoice-col">
               <b>Invoice:</b> {{active_bill.invoice_no}}<br/>
-              <b>Payment Due On:</b> 2/22/2014<br/>
+              <b>Payment Due On:</b> {{date_now}}<br/>
             </div><!-- /.col -->
           </div><!-- /.row -->
 
@@ -92,12 +92,20 @@
               <h5><b>{{active_bill.payment_method.name | capfirst}}</b></h5>
             </div><!-- /.col -->
             <div class="col-xs-6">
-              <p class="lead">Amount Due 2/22/2014</p>
+              <p class="lead">Summary</p>
               <div class="table-responsive">
                 <table class="table">
                   <tr>
                     <th>Total in KES:</th>
                     <td>{{active_bill.get_bill_total | floatformat:2 | intcomma}}</td>
+                  </tr>
+                  <tr>
+                    <th>Amount Paid in KES:</th>
+                    <td>{{active_bill.get_total_amount_paid | floatformat:2 | intcomma}}</td>
+                  </tr>
+                  <tr>
+                    <th>Amount Due in KES:</th>
+                    <td>{{amount_due | floatformat:2 | intcomma}}</td>
                   </tr>
                 </table>
               </div>
